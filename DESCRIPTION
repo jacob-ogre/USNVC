@@ -1,0 +1,21 @@
+Package: nvcr
+Type: Package
+Title: Package for the United States National Vegetation Classification
+Version: 0.1.0
+Authors@R: person("Jacob", "Malcom",
+                  email = "jmalcom@defenders.org",
+                  role = c("aut", "cre"))
+Description: Data from the United States National Vegetation Classification
+    (NVC) database, available from http://usnvc.org/explore-classification/.
+    This packages includes all tables from the database as data.frames; a set of
+    pre-joined tables that seem most useful; and document-term matrics (DTMs)
+    from feature definitions.
+Depends:
+    R (>= 3.2.3)
+License: BSD_2_clause + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 5.0.1
+Imports:
+    dplyr,
+    RSQLite

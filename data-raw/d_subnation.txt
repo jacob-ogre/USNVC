@@ -1,0 +1,78 @@
+SUBNATION_ID	ISO_NATION_CD	SUBNATION_CODE	SUBNATION_NAME
+4	US	AR	Arkansas
+2	US	AL	Alabama
+70	CA	SK	Saskatchewan
+50	US	TN	Tennessee
+24	US	MA	Massachusetts
+92	CA	NF	Newfoundland Island
+78	MX	QR	Quintana Roo
+43	US	OK	Oklahoma
+14	US	GA	Georgia
+379	MX	CH	Chihuahua
+44	US	OR	Oregon
+58	US	WV	West Virginia
+67	CA	ON	Ontario
+29	US	MN	Minnesota
+32	US	MS	Mississippi
+85	MX	ZA	Zacatecas
+65	CA	NT	Northwest Territories
+21	US	KS	Kansas
+19	US	IL	Illinois
+33	US	MT	Montana
+20	US	IN	Indiana
+22	US	KY	Kentucky
+11	US	DE	Delaware
+63	CA	NB	New Brunswick
+377	MX	BC	Baja California
+93	CA	YT	Yukon Territory
+72	MX	BS	Baja California del Sur
+51	US	TX	Texas
+36	US	NE	Nebraska
+49	US	SD	South Dakota
+48	US	SC	South Carolina
+12	US	FL	Florida
+56	US	WA	Washington
+41	US	NY	New York
+38	US	NJ	New Jersey
+82	MX	TM	Tamaulipas
+52	US	UT	Utah
+25	US	MD	Maryland
+7	US	CA	California
+69	CA	QC	Quebec
+61	CA	BC	British Columbia
+1	US	AK	Alaska
+227	CA	NU	Nunavut
+6	US	AZ	Arizona
+39	US	NM	New Mexico
+35	US	ND	North Dakota
+45	US	PA	Pennsylvania
+9	US	CT	Connecticut
+42	US	OH	Ohio
+68	CA	PE	Prince Edward Island
+80	MX	SO	Sonora
+83	MX	VE	Veracruz
+30	US	MO	Missouri
+76	MX	NU	Nuevo Leon
+59	US	WY	Wyoming
+28	US	MI	Michigan
+57	US	WI	Wisconsin
+34	US	NC	North Carolina
+37	US	NH	New Hampshire
+91	CA	LB	Labrador
+381	MX	CO	Coahuila
+17	US	IA	Iowa
+8	US	CO	Colorado
+40	US	NV	Nevada
+62	CA	MB	Manitoba
+18	US	ID	Idaho
+23	US	LA	Louisiana
+47	US	RI	Rhode Island
+10	US	DC	District of Columbia
+53	US	VA	Virginia
+66	CA	NS	Nova Scotia
+26	US	ME	Maine
+55	US	VT	Vermont
+16	US	HI	Hawaii
+60	CA	AB	Alberta
+392	MX	SL	San Luis Potosi
+383	MX	DU	Durango
