@@ -12,7 +12,7 @@ The [U.S. National Vegetation Classificaiton (NVC)](http://usnvc.org) is a stand
 devtools::install_github("jacob-ogre/USNVC")
 ```
 
-To get the most out of the data, you'll need the [igraph](igraph.org/r/) package.
+To get the most out of the data, you'll need the [`igraph`](igraph.org/r/) package.
 
 ## NVC as a network
 
