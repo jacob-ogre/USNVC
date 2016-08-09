@@ -44,16 +44,29 @@ get_ancestors <- function(g, v) {
 #' @export
 #' @examples
 #' \dontrun{
-#' get_root_path("Temperate Interstitial Shore")
+#' get_root_path(NVC_graph, "860275")
 #' }
-get_root_path <- function(g, leaf) {
+get_root_path <- function(g, v) {
   path <- igraph::shortest_paths(g, mode = "all",
-                                 from = match("Natural", V(g)$ELE),
-                                 to = match(leaf, V(g)$colloquial))$vpath
+                                 from = 1,
+                                 to = match(v, V(g)$name))$vpath
   names <- igraph::get.vertex.attribute(g,
-                                        "colloquial",
+                                        "colloquialName",
                                         index = V(g)[path[[1]]])
-  return(names[2:length(names)])
+  return(names[3:length(names)])
+}
+
+#' Return the NVC Class to which a given vertex belongs
+#'
+#' @param g The graph to query
+#' @param v The vertex ID ('name' of attr) to trace back to Class
+#' @return The colloquialName of the Class to which vertex v belongs
+#' @seealso if any see alsos
+#' @export
+#' @examples
+#' get_top_class(NVC_graph, "860285")
+get_top_class <- function(g, v) {
+  return(get_root_path(g, v)[1])
 }
 
 #' Find the path between nodes in the NVC graph

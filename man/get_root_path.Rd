@@ -4,7 +4,7 @@
 \alias{get_root_path}
 \title{Get the root Class for any given leaf vertex}
 \usage{
-get_root_path(g, leaf)
+get_root_path(g, v)
 }
 \arguments{
 \item{g}{The graph to be queried}
@@ -19,7 +19,7 @@ More detailed description of the function
 }
 \examples{
 \dontrun{
-get_root_path("Temperate Interstitial Shore")
+get_root_path(NVC_graph, "860275")
 }
 }
 
