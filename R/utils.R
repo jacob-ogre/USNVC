@@ -5,10 +5,11 @@
 #' For natural assemblages, level is one of: Class, Subclass, Formation,
 #' Division, Macrogroup, Group, Alliance, Association. For human-created
 #' features, one of: Cultural Class, Cultural Subclass, Cultural Formation,
-#' Cultural Subformation, Cultural Type, Cultural Group, Cultural Subgroup
+#' Cultural Subformation, Cultural Type, Cultural Group, Cultural Subgroup.
 #'
 #' @param level The hierarchical level of the NVC to extract
 #' @return A data.frame with global ID, colloquial name, and the type concept
+#' @importFrom dplyr filter select
 #' @export
 #' @examples
 #' get_hier_desc("Class")
@@ -69,6 +70,7 @@ prep_for_visNetwork <- function(g) {
 #' @param g The graph to be queried
 #' @param v The NVC category for which the 'full' typeConcept will be created
 #' @return A string of all relevant typeConcepts, concatenated with ' | '
+#' @importFrom igraph V
 #' @export
 #' @examples
 #' get_full_typeConcept(NVC_graph, "860275")

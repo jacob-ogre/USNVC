@@ -46,7 +46,7 @@ make_igraph <- function(df, directed = TRUE) {
 #' }
 graph_to_depth <- function(g, depth) {
   center <- length(V(g)$name)
-  to_dep <- make_ego_graph(g, depth, center)[[1]]
+  to_dep <- igraph::make_ego_graph(g, depth, center)[[1]]
   return(to_dep)
 }
 
