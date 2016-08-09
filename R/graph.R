@@ -127,5 +127,3 @@ relatives_graph <- function(g, v) {
   }
   return(res)
 }
-
-
