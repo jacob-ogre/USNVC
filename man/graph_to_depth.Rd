@@ -17,4 +17,9 @@ An igraph subgraph of g, to distance `depth`
 \description{
 Useful, perhaps, for plotting a small version of the full NVC_graph.
 }
+\examples{
+\dontrun{
+graph_to_depth(NVC_graph, 2)
+}
+}
 
