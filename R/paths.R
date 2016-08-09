@@ -13,7 +13,6 @@
 #' get_children(NVC_graph, "856963")
 #' }
 get_children <- function(g, v) {
-  # if(is.numeric(v)) v <- as.character(v)
   return(igraph::subcomponent(g, v, "out"))
 }
 
@@ -30,7 +29,6 @@ get_children <- function(g, v) {
 #' get_ancestors(NVC_graph, "856963")
 #' }
 get_ancestors <- function(g, v) {
-  # if(is.numeric(v)) v <- as.character(v)
   return(igraph::subcomponent(g, v, "in"))
 }
 
@@ -79,15 +77,13 @@ get_top_class <- function(g, v) {
 #' @importFrom igraph shortest_paths get.vertex.attribute
 #' @export
 #' @examples
-#' path_between_cats(NVC_graph,
-#'                   "Wet Coosa Valley Barrens",
-#'                   "Shale Barren Slopes")
+#' path_between_cats(NVC_graph, "685697", "686373")
 path_between_cats <- function(g, node1, node2) {
   path <- igraph::shortest_paths(g, mode = "all",
-                                 from = match(node1, V(g)$colloquial),
-                                 to = match(node2, V(g)$colloquial))$vpath
+                                 from = match(node1, V(g)$name),
+                                 to = match(node2, V(g)$name))$vpath
   names <- igraph::get.vertex.attribute(g,
-                                        "colloquial",
+                                        "colloquialName",
                                         index = V(g)[path[[1]]])
   return(names)
 }
