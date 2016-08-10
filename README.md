@@ -2,7 +2,9 @@
 
 An R package for the U.S. National Vegetation Classification (NVC) database.
 
-The [U.S. National Vegetation Classificaiton (NVC)](http://usnvc.org) is a standardized, hierarchical classification system for vegetation in the United States. (It is aptly named.) The [NVC standards](https://www.fgdc.gov/standards/projects/FGDC-standards-projects/vegetation/NVCS_V2_FINAL_2008-02.pdf) were developed by a partnership of agencies (e.g., USDA Forest Service and US Geological Survey), professional organizations (e.g., the Ecological Society of America), and non-profits (e.g., NatureServe). The full NVC database, which can be downloaded [here](http://usnvc.org/explore-classification/), contains 18 tables with information on 8,192 vegetation categories, ranging in scope from seven very broad Classes to >4,000 highly refined Associations.
+The [U.S. National Vegetation Classificaiton (NVC)](http://usnvc.org) is a standardized, hierarchical classification system for vegetation in the United States. (It is aptly named.) The [NVC standards](https://www.fgdc.gov/standards/projects/FGDC-standards-projects/vegetation/NVCS_V2_FINAL_2008-02.pdf) were developed by a partnership of agencies (e.g., USDA Forest Service and US Geological Survey), professional organizations (e.g., the Ecological Society of America), and non-profits (e.g., NatureServe). The full NVC database, which can be downloaded [here](http://www1.usgs.gov/csas/nvcs_data/USNVCFullDownload.zip), contains 18 tables with information on 8,192 vegetation categories, ranging in scope from seven very broad Classes to >4,000 highly refined Associations. 
+
+__NOTE:__ It's not clear how I ever got to the data download URL...but as of 10 Aug 2016, the link still works and the download has the same MD5 hash (cfe77e3187783ed7c5f7f3d3118a45cb) as the version in this package.
 
 ## Installation
 

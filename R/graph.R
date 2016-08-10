@@ -127,3 +127,9 @@ relatives_graph <- function(g, v) {
   }
   return(res)
 }
+
+# TODO: Add function to filter on state (Subnation) and fill subnation upstream,
+# i.e., fill empty Subnation with union of child node Subnations
+
+# TODO: Add function to filter on federalLands and fill upstream,
+# i.e., fill empty federalLands with union of child node federalLands

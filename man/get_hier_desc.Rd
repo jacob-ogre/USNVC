@@ -16,7 +16,7 @@ A data.frame with global ID, colloquial name, and the type concept
 For natural assemblages, level is one of: Class, Subclass, Formation,
 Division, Macrogroup, Group, Alliance, Association. For human-created
 features, one of: Cultural Class, Cultural Subclass, Cultural Formation,
-Cultural Subformation, Cultural Type, Cultural Group, Cultural Subgroup
+Cultural Subformation, Cultural Type, Cultural Group, Cultural Subgroup.
 }
 \examples{
 get_hier_desc("Class")

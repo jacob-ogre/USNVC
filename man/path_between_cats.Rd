@@ -20,8 +20,6 @@ A list of the node (categories) on the path from node1 to node2
 More detailed description of the function
 }
 \examples{
-path_between_cats(NVC_graph,
-                  "Wet Coosa Valley Barrens",
-                  "Shale Barren Slopes")
+path_between_cats(NVC_graph, "685697", "686373")
 }
 
