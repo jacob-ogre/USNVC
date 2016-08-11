@@ -449,5 +449,26 @@
 #' }
 #' @seealso \link{d_dist_confidence} \link{d_curr_presence_absence}
 #' @source https://www1.usgs.gov/csas/nvcs_data/USNVCFullDownload.zip
-"UnitXSimilarUnit"
+"UnitXSubnation"
+
+#' Descriptions of vegetation categories from USGS GAP landcover
+#'
+#' @format A data.frame with 32934 rows and 4 columns
+#' \describe{
+#' \item{\code{Area}}{Numeric code for Area_Name}
+#' \item{\code{Area_Name}}{Name or abbreviation of the Area}
+#' \item{\code{Grid_Value}}{Within-Area index}
+#' \item{\code{Comb_Value}}{Across-Area index (cumulative)}
+#' \item{\code{NVCMES}}{Alpha-numeric code for a vegetation category, presumably
+#'             referenced to NVC v1}
+#' \item{\code{EVT_Value}}{Another identifier, but unknown relationship}
+#' \item{\code{Class_Name}}{A 'colloquial' name for the vegetation category}
+#' \item{\code{Description}}{Text description of the characteristics of the
+#'             vegetation category. Appears to combine physiognomy, dynamics,
+#'             environment, and floristics in a single paragraph.}
+#' }
+#' @seealso \link{d_dist_confidence} \link{d_curr_presence_absence}
+#' @source https://www1.usgs.gov/csas/nvcs_data/USNVCFullDownload.zip
+"GAP_df"
+
 

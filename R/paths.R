@@ -36,7 +36,7 @@ get_ancestors <- function(g, v) {
 #'
 #' More detailed description of the function
 #' @param g The graph to be queried
-#' @param leaf A character string of the name of the leaf node to trace back
+#' @param v A character string of the identifier node to trace back
 #' @return A vector of the path from the leaf node to its Class root
 #' @importFrom igraph shortest_paths get.vertex.attribute
 #' @export

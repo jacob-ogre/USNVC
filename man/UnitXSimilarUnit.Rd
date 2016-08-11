@@ -11,21 +11,12 @@
 }}
 \source{
 https://www1.usgs.gov/csas/nvcs_data/USNVCFullDownload.zip
-
-https://www1.usgs.gov/csas/nvcs_data/USNVCFullDownload.zip
 }
 \usage{
-UnitXSimilarUnit
-
 UnitXSimilarUnit
 }
 \description{
 Unclear how this table was derived.
-
-Relationships of subnation IDs to NVC categories
-}
-\seealso{
-\link{d_dist_confidence} \link{d_curr_presence_absence}
 }
 \keyword{datasets}
 

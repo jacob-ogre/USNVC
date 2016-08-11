@@ -12,4 +12,4 @@ unit_data <- dplyr::full_join(unit_data,
                               by = "D_CLASSIFICATION_LEVEL_ID")
 dim(unit_data)
 
-devtools::use_data(unit_data)
+devtools::use_data(unit_data, overwrite = TRUE)

@@ -1,0 +1,142 @@
+---
+title: "NVC v2 and GAP relationships"
+author: "Jacob Malcom"
+date: "August 10, 2016"
+output:
+    rmarkdown::html_document:
+        toc: true
+        toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(topicmodels)
+library(USNVC)
+# library(textualnvc)
+library(tm)
+```
+
+## The Challenge
+
+We would like to be able to project the 'new' U.S. National Vegetation Classification (NVC) information onto maps. USGS has already done high-resolution vegetation mapping using a categorization system that is related to NVC, but version 1. If we could crosswalk the NVC v2 and GAP vegetation categories, then we could do the desire projections. Both classifications provide descriptions of each category--NVC for >8,000 entries, GAP for 772--and, I think, the NVC v2 `typeConcepts` are based in part on the GAP descriptions (which, in turn, are based on NVC v1 [again, I think]).
+
+## Correlations of DTMs
+
+The first attempt is based on looking for correlations between the terms used for each category in NVC and the terms used in GAP to describe each category in their respective classification schemes. If an NVC category is synonymous (or closely related) to a GAP category, then the words used in both descriptions should be similar. I hope. First, we need to create the Document-Term Matrix for the combined NVC and GAP text:
+
+```{r dtms1, echo = TRUE}
+group <- dplyr::filter(unit_data, CLASSIFICATION_LEVEL_NAME == "Group") 
+NVC_text <- paste(group$translatedName,
+                  group$typeConcept, 
+                  group$Physiognomy,
+                  group$Environment,
+                  group$Dynamics,
+                  group$Floristics,
+                  group$Range)
+GAP_text <- paste(GAP_df$Class_Name, GAP_df$Description)
+texts <- c(NVC_text, GAP_text)
+corp <- tm::VCorpus(tm::VectorSource(texts))
+cln <- USNVC::prep_text(corp)
+dtm <- tm::DocumentTermMatrix(cln)
+dtm$dimnames$Docs <- c(group$ELEMENT_GLOBAL_ID, GAP_df$Class_Name)
+word_freq <- table(dtm$j)
+# NVC_dtm <- NVC_dtm[!is.na(row.names(NVC_dtm)), ]
+slim <- dtm[, which(word_freq <= 10 & word_freq >= 2)]
+slim <- slim[which(rowSums(as.matrix(slim)) > 0), ]
+summary(rowSums(as.matrix(slim)))
+dim(slim)
+```
+
+Then do the document (row) by document correlations:
+
+```{r doc_x_doc_cor}
+res <- matrix(NA, nrow = 401, ncol = 750)
+rownames(res) <- slim$dimnames$Docs[1:401]
+colnames(res) <- slim$dimnames$Docs[402:length(slim$dimnames$Docs)]
+dtm_mat <- as.matrix(slim)
+for(i in 1:401) {
+  for(j in 402:1151) {
+    res[i, j - 401] <- cor(dtm_mat[i, ], dtm_mat[j, ])
+  }
+}
+DTM_doc_cor <- res
+save(DTM_doc_cor, file = "DTM_doc_cor.rda")
+
+GAP_nm <- colnames(DTM_doc_cor)
+NVC_nm <- row.names(DTM_doc_cor)
+GAP <- rep(NA, length(GAP_nm))
+NVC <- rep(NA, length(GAP_nm))
+cor <- rep(NA, length(GAP_nm))
+for(i in 1:length(GAP_nm)) {
+  cur_max <- max(DTM_doc_cor[, GAP_nm[i]])
+  cur_mat <- NVC_nm[which(DTM_doc_cor[, GAP_nm[i]] == cur_max)]
+  GAP[i] <- GAP_nm[i]
+  NVC[i] <- paste(cur_mat, collapse = ", ")
+  cor[i] <- cur_max
+}
+best_GAP_NVC_cors <- tibble::data_frame(GAP = GAP, NVC = NVC, cor = cor)
+save(best_GAP_NVC_cors, file = "best_GAP_NVC_cors.rda")
+knitr::kable(head(best_GAP_NVC_cors, 10))
+```
+
+Now consider the example of the first match:
+
+```{r cor_ex}
+dplyr::filter(GAP_df, Class_Name == best_GAP_NVC_cors$GAP[1])$Description
+dplyr::filter(unit_data, ELEMENT_GLOBAL_ID == best_GAP_NVC_cors$NVC[1])$typeConcept
+```
+
+Unfortunately, that doesn't work for all examples, e.g.:
+
+```{r bad_ex}
+comp <- best_GAP_NVC_cors[722, ]
+data.frame(dplyr::filter(GAP_df, Class_Name == comp$GAP))
+hits <- unlist(strsplit(comp$NVC, split = ", "))
+dplyr::filter(unit_data, ELEMENT_GLOBAL_ID %in% hits)
+
+```
+
+## Latent Dirichlet Allocation
+
+Now, for the LDA analysis.
+
+```{r LDA_1}
+NVC_grp <- dplyr::filter(unit_data, 
+                         CLASSIFICATION_LEVEL_NAME == "Alliance" |
+                         CLASSIFICATION_LEVEL_NAME == "Association")
+NVC_text <- paste(NVC_grp$translatedName,
+                  NVC_grp$typeConcept, 
+                  NVC_grp$Physiognomy,
+                  NVC_grp$Environment,
+                  NVC_grp$Dynamics,
+                  NVC_grp$Floristics,
+                  NVC_grp$Range)
+NVC_corp <- tm::VCorpus(tm::VectorSource(NVC_text))
+NVC_cln <- USNVC::prep_text(NVC_corp)
+NVC_dtm <- tm::DocumentTermMatrix(NVC_cln)
+NVC_dtm$dimnames$Docs <- as.character(NVC_grp$ELEMENT_GLOBAL_ID)
+word_freq <- table(NVC_dtm$j)
+# NVC_dtm <- NVC_dtm[!is.na(row.names(NVC_dtm)), ]
+slim <- NVC_dtm[, which(word_freq <= 10 & word_freq >= 2)]
+slim <- slim[which(rowSums(as.matrix(slim)) > 0), ]
+summary(rowSums(as.matrix(slim)))
+dim(slim)
+NVC_lda <- LDA(x = slim,
+               k = 453,
+               method = "Gibbs",
+               control = list(seed = 742,
+                              burnin = 1000,
+                              thin = 100,
+                              iter = 1000))
+save(NVC_lda, file = "NVC_lda.rda")
+
+# Now to fit the GAP descriptions to the NVC topics
+GAP_corp <- tm::VCorpus(tm::VectorSource(GAP_text))
+GAP_cln <- USNVC::prep_text(GAP_corp)
+GAP_dtm <- tm::DocumentTermMatrix(GAP_cln)
+GAP_dtm$dimnames$Docs <- as.character(GAP_df$Class_Name)
+
+GAP_post <- posterior(NVC_lda, GAP_dtm)
+save(GAP_post, file = "GAP_post.rda")
+```
+

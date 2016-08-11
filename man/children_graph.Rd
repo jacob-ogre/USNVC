@@ -21,6 +21,6 @@ More detailed description of the function
 children_graph(NVC_graph, "856963")
 }
 \seealso{
-\link{ancestor_graph}
+\link{ancestors_graph}
 }
 

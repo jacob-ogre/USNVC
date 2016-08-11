@@ -1,5 +1,28 @@
 # BSD_2_clause
 
+#' Clean corpus text for NLP
+#'
+#' @param corp A corpus from \link[tm]{tm}
+#' @return A corpus with puctuation, numbers, stopwords, and whitespace removed
+#' @seealso if any see alsos
+#' @import tm
+#' @export
+#' @examples
+#' \dontrun{
+#' prep_text(a_corpus)
+#' }
+prep_text <- function(corp) {
+  cln_corp <- tm::tm_map(corp,
+                         function(x) {
+                           tolower(iconv(enc2utf8(as.character(x)),sub = "byte"))})
+  cln_corp <- tm::tm_map(cln_corp, tm::removePunctuation)
+  cln_corp <- tm::tm_map(cln_corp, tm::removeNumbers)
+  cln_corp <- tm::tm_map(cln_corp, tm::removeWords, stopwords("english"))
+  cln_corp <- tm::tm_map(cln_corp, tm::stripWhitespace)
+  cln_corp <- tm::tm_map(cln_corp, tm::PlainTextDocument)
+  return(cln_corp)
+}
+
 #' Get description data for a level of the NVC hierarchy
 #'
 #' For natural assemblages, level is one of: Class, Subclass, Formation,
@@ -14,7 +37,7 @@
 #' @examples
 #' get_hier_desc("Class")
 get_hier_desc <- function(level) {
-  sub <- dplyr::filter(unit_data, hierarchyLevel == level)
+  sub <- dplyr::filter(USNVC::unit_data, hierarchyLevel == level)
   res <- dplyr::select(sub, ELEMENT_GLOBAL_ID, colloquialName, typeConcept)
   return(res)
 }

@@ -56,7 +56,7 @@ graph_to_depth <- function(g, depth) {
 #' @param g The graph from which to get children of vertex v
 #' @param v The vertex of g from which to get 'downstream' vertices
 #' @return A subgraph of g with v and its children
-#' @seealso \link{ancestor_graph}
+#' @seealso \link{ancestors_graph}
 #' @importFrom igraph induced_subgraph
 #' @export
 #' @examples
@@ -89,6 +89,7 @@ ancestors_graph <- function(g, v) {
 #' @seealso \link{children_graph}
 #' @seealso \link{ancestors_graph}
 #' @importFrom igraph union
+#' @importFrom stringr str_replace
 #' @export
 #' @examples
 #' relatives_graph(NVC_graph, "856963")

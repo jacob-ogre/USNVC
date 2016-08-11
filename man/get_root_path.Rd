@@ -9,7 +9,7 @@ get_root_path(g, v)
 \arguments{
 \item{g}{The graph to be queried}
 
-\item{leaf}{A character string of the name of the leaf node to trace back}
+\item{v}{A character string of the identifier node to trace back}
 }
 \value{
 A vector of the path from the leaf node to its Class root
