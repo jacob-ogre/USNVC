@@ -138,6 +138,7 @@ Now, for the LDA analysis.
 # GAP_dtm <- tm::DocumentTermMatrix(GAP_cln)
 # GAP_dtm$dimnames$Docs <- as.character(GAP_df$Class_Name)
 # GAP_2 <- GAP_dtm[which(rowSums(as.matrix(GAP_dtm)) > 0), ]
+# save(GAP_2, file = "GAP_2.rda")
 # 
 # GAP_post <- posterior(NVC_lda, GAP_2)
 # save(GAP_post, file = "GAP_post.rda")
@@ -175,41 +176,175 @@ It looks like the process worked; now I want to see what the results look like.
 OK, I don't know what thresholds I should use for accepting an assignment, but I think the fact that the above example worked is promising. Probably the best thing to do is build LDAs for each level, with K = n_cat for the level above each focal level.
 
 ```{r build_ldas}
-nat <- filter(unit_data, 
-              !grepl(unit_data$CLASSIFICATION_LEVEL_NAME, 
-                    pattern = "Cultural"))
-cats <- unique(nat$CLASSIFICATION_LEVEL_NAME)
-for(i in 2:length(cats)) {
-  cur_top <- filter(nat, CLASSIFICATION_LEVEL_NAME == cats[i-1])
-  cur_sub <- filter(nat, CLASSIFICATION_LEVEL_NAME == cats[i])
-  cur_k <- length(cur_top[[1]])
-  cur_txt <- paste(cur_sub$translatedName,
-                   cur_sub$typeConcept, 
-                   cur_sub$Physiognomy,
-                   cur_sub$Environment,
-                   cur_sub$Dynamics,
-                   cur_sub$Floristics,
-                   cur_sub$Range)
-  cur_corp <- tm::VCorpus(tm::VectorSource(cur_txt))
-  cur_cln <- USNVC::prep_text(cur_corp)
-  cur_dtm <- tm::DocumentTermMatrix(cur_cln)
-  cur_dtm$dimnames$Docs <- as.character(cur_sub$ELEMENT_GLOBAL_ID)
-  word_freq <- table(cur_dtm$j)
-  slim <- cur_dtm[, which(word_freq <= 10 & word_freq >= 2)]
-  slim <- slim[which(rowSums(as.matrix(slim)) > 0), ]
-  cur_lda <- LDA(x = slim,
-                 k = cur_k,
-                 method = "Gibbs",
-                 control = list(seed = 742,
-                                burnin = 1000,
-                                thin = 100,
-                                iter = 1000))
-  cur_name <- paste0(cats[i], "_to", cats[i-1], "_lda_model")
-  assign(x = cur_name, value = cur_lda)
-}
-
-lapply(ls(pattern = "_lda_model"), FUN = function(x) {
-  save(list = x, file = paste0(x, ".rda")) }
-)
+# nat <- filter(unit_data, 
+#               !grepl(unit_data$CLASSIFICATION_LEVEL_NAME, 
+#                     pattern = "Cultural"))
+# cats <- unique(nat$CLASSIFICATION_LEVEL_NAME)
+# for(i in 2:length(cats)) {
+#   cur_top <- filter(nat, CLASSIFICATION_LEVEL_NAME == cats[i-1])
+#   cur_sub <- filter(nat, CLASSIFICATION_LEVEL_NAME == cats[i])
+#   cur_k <- length(cur_top[[1]])
+#   cur_txt <- paste(cur_sub$translatedName,
+#                    cur_sub$typeConcept, 
+#                    cur_sub$Physiognomy,
+#                    cur_sub$Environment,
+#                    cur_sub$Dynamics,
+#                    cur_sub$Floristics,
+#                    cur_sub$Range)
+#   cur_corp <- tm::VCorpus(tm::VectorSource(cur_txt))
+#   cur_cln <- USNVC::prep_text(cur_corp)
+#   cur_dtm <- tm::DocumentTermMatrix(cur_cln)
+#   cur_dtm$dimnames$Docs <- as.character(cur_sub$ELEMENT_GLOBAL_ID)
+#   word_freq <- table(cur_dtm$j)
+#   slim <- cur_dtm[, which(word_freq <= 10 & word_freq >= 2)]
+#   slim <- slim[which(rowSums(as.matrix(slim)) > 0), ]
+#   cur_lda <- LDA(x = slim,
+#                  k = cur_k,
+#                  method = "Gibbs",
+#                  control = list(seed = 742,
+#                                 burnin = 1000,
+#                                 thin = 100,
+#                                 iter = 1000))
+#   cur_name <- paste0(cats[i], "_to", cats[i-1], "_lda_model")
+#   assign(x = cur_name, value = cur_lda)
+# }
+# 
+# lapply(ls(pattern = "_lda_model"), FUN = function(x) {
+#   save(list = x, file = paste0(x, ".rda")) }
+# )
 
 ```
+
+Now that we have some LDAs for each NVC transition, we can try to fit the GAP data to each set of models to try to find optimum matches.
+
+```{r fit_GAP_to_LDAs}
+# load("Subclass_toClass_lda_model.rda")
+# load("Formation_toSubclass_lda_model.rda")
+# load("Division_toFormation_lda_model.rda")
+# load("Group_toMacrogroup_lda_model.rda")
+# load("Macrogroup_toDivision_lda_model.rda")
+# load("Alliance_toGroup_lda_model.rda")
+# load("Association_toAlliance_lda_model.rda")
+# 
+# GAP_Class <- posterior(Subclass_toClass_lda_model, GAP_2)
+# save(GAP_Class, file = "GAP_Class.rda")
+# GAP_Subclass <- posterior(Formation_toSubclass_lda_model, GAP_2)
+# save(GAP_Subclass, file = "GAP_Subclass.rda")
+# GAP_Formation <- posterior(Division_toFormation_lda_model, GAP_2)
+# save(GAP_Formation, file = "GAP_Formation.rda")
+# GAP_Division <- posterior(Macrogroup_toDivision_lda_model, GAP_2)
+# save(GAP_Division, file = "GAP_Division.rda")
+# GAP_Macrogroup <- posterior(Group_toMacrogroup_lda_model, GAP_2)
+# save(GAP_Macrogroup, file = "GAP_Macrogroup.rda")
+# GAP_Group <- posterior(Alliance_toGroup_lda_model, GAP_2)
+# save(GAP_Group, file = "GAP_Group.rda")
+# GAP_Alliance <- posterior(Association_toAlliance_lda_model, GAP_2)
+# save(GAP_Alliance, file = "GAP_Alliance.rda")
+```
+
+After glancing through a few of the examples, I think I have a way forward. 
+
+- For each GAP to LDA_model combination, calculate binned counts (histogram with `plot = FALSE`);
+- For each histogram use `vegan::diversity` to calculate whether there is any diversity to the assignments;
+- If diversity == 0, then no assignment; if diversity > some_threshold, pick NVC categories at the given level with the highest posterior probabilities;
+- The last point means that we need to figure out how to set the thresholds, which means we need to know what the distributions of diversities looks like:
+
+```{r eval_GAP_post, fig.height = 3, fig.width=7}
+load("GAP_Class.rda")
+load("GAP_Subclass.rda")
+load("GAP_Formation.rda")
+load("GAP_Division.rda")
+load("GAP_Macrogroup.rda")
+load("GAP_Group.rda")
+load("GAP_Alliance.rda")
+
+hist_counts <- function(x) {
+  return(hist(x, plot = FALSE)$counts)
+}
+
+max_sec <- function(x) {
+  cur_max <- max(x)
+  sorted <- unique(sort(x, decreasing = TRUE))
+  second <- nth(sorted, 2)
+  return(cur_max / second)
+}
+
+Class_hist <- apply(GAP_Class$topics, MARGIN = 1, FUN = hist_counts)
+Class_divs <- unlist(lapply(Class_hist, vegan::diversity))
+Class_best <- apply(GAP_Class$topics, MARGIN = 1, FUN = max_sec)
+# hist(Class_divs)
+
+Subclass_hist <- apply(GAP_Subclass$topics, MARGIN = 1, FUN = hist_counts)
+Subclass_divs <- unlist(lapply(Subclass_hist, vegan::diversity))
+Subclass_best <- apply(GAP_Subclass$topics, MARGIN = 1, FUN = max_sec)
+# hist(Subclass_divs)
+
+Formation_hist <- apply(GAP_Formation$topics, MARGIN = 1, FUN = hist_counts)
+Formation_divs <- unlist(lapply(Formation_hist, vegan::diversity))
+# hist(Formation_divs)
+
+Division_hist <- apply(GAP_Division$topics, MARGIN = 1, FUN = hist_counts)
+Division_divs <- unlist(lapply(Division_hist, vegan::diversity))
+# hist(Division_divs)
+
+Macrogroup_hist <- apply(GAP_Macrogroup$topics, MARGIN = 1, FUN = hist_counts)
+Macrogroup_divs <- unlist(lapply(Macrogroup_hist, vegan::diversity))
+# hist(Macrogroup_divs)
+
+Group_hist <- apply(GAP_Group$topics, MARGIN = 1, FUN = hist_counts)
+Group_divs <- unlist(lapply(Group_hist, vegan::diversity))
+# hist(Group_divs)
+
+Alliance_hist <- apply(GAP_Alliance$topics, MARGIN = 1, FUN = hist_counts)
+Alliance_divs <- unlist(lapply(Alliance_hist, vegan::diversity))
+Alliance_best <- apply(GAP_Alliance$topics, MARGIN = 1, FUN = max_sec)
+# hist(Alliance_divs)
+```
+
+Wow, that's a steady march left of the distribution of Shannon's diversity values...as we might expect given the change in the number of categories:
+
+```{r plot_div_hists, fig.height=4, fig.width=7, echo=FALSE}
+# par(mfrow = c(7,1), mar = c(1,1,1,1))
+hist(Class_divs, xlim = c(0,2))
+hist(Subclass_divs, xlim = c(0,2))
+hist(Formation_divs, xlim = c(0,2))
+hist(Division_divs, xlim = c(0,2))
+hist(Macrogroup_divs, xlim = c(0,2))
+hist(Group_divs, xlim = c(0,2))
+hist(Alliance_divs, xlim = c(0,2))
+
+# par(mfrow = c(1,1), mar = c(5,5,3,3))
+```
+
+I think this means there is no single diversity cutoff that applies to all levels of the NVC hierarchy. But...
+
+## Two steps forward, one back
+
+As I explored the data to find some of the best matches, I see that there are some problems with the LDAs. There are a significant number of matches where the only text for the NVC model is the `translatedName` of the category. How often is this a problem? About 1/8 of all NVC categories have extremely limited text, i.e., < 100 characters.
+
+```{r check_nchar}
+conv_txt <- function(x) {
+  return(iconv(x = x, from = "iso-8859-1", to = "utf-8"))
+}
+
+NVC_text <- paste(unit_text$translatedName,
+                  unit_text$typeConcept,
+                  unit_text$Physiognomy,
+                  unit_text$Environment,
+                  unit_text$Dynamics,
+                  unit_text$Floristics,
+                  unit_text$Range)
+
+txt_nchar <- lapply(NVC_text, FUN = function(x) nchar(conv_txt(x)))
+hist(txt_nchar, breaks = 100)
+tmp <- txt_nchar[txt_nchar < 1000]
+hist(tmp, breaks = 40)
+length(txt_nchar[txt_nchar < 100])
+length(txt_nchar)
+```
+
+# Restart
+
+While I could go back to the preceding code and do a bunch of edits, I think I will keep it all in place as a reminder... So without further ado, here's a re-do:
+
+
