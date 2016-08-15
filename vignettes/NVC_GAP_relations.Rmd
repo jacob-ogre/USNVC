@@ -327,15 +327,15 @@ conv_txt <- function(x) {
   return(iconv(x = x, from = "iso-8859-1", to = "utf-8"))
 }
 
-NVC_text <- paste(unit_text$translatedName,
-                  unit_text$typeConcept,
-                  unit_text$Physiognomy,
-                  unit_text$Environment,
-                  unit_text$Dynamics,
-                  unit_text$Floristics,
-                  unit_text$Range)
+NVC_text <- paste(unit_data$translatedName,
+                  unit_data$typeConcept,
+                  unit_data$Physiognomy,
+                  unit_data$Environment,
+                  unit_data$Dynamics,
+                  unit_data$Floristics,
+                  unit_data$Range)
 
-txt_nchar <- lapply(NVC_text, FUN = function(x) nchar(conv_txt(x)))
+txt_nchar <- unlist(lapply(NVC_text, FUN = function(x) nchar(conv_txt(x))))
 hist(txt_nchar, breaks = 100)
 tmp <- txt_nchar[txt_nchar < 1000]
 hist(tmp, breaks = 40)
@@ -347,4 +347,111 @@ length(txt_nchar)
 
 While I could go back to the preceding code and do a bunch of edits, I think I will keep it all in place as a reminder... So without further ado, here's a re-do:
 
+```{r restart_1}
+conv_txt <- function(x) {
+  return(iconv(x = x, from = "iso-8859-1", to = "utf-8"))
+}
+
+# cats <- unique(unit_data$CLASSIFICATION_LEVEL_NAME)
+# for(i in 2:length(cats)) {
+#   print(c(i, cats[i]))
+#   cur_top <- filter(unit_data, CLASSIFICATION_LEVEL_NAME == cats[i-1])
+#   cur_sub <- filter(unit_data, CLASSIFICATION_LEVEL_NAME == cats[i])
+#   cur_k <- length(cur_top[[1]])
+#   cur_txt <- paste(cur_sub$translatedName,
+#                    cur_sub$typeConcept,
+#                    cur_sub$Physiognomy,
+#                    cur_sub$Environment,
+#                    cur_sub$Dynamics,
+#                    cur_sub$Floristics,
+#                    cur_sub$Range)
+#   cur_txt <- conv_txt(cur_txt)
+#   txt_nchar <- nchar(cur_txt)
+#   txt_df <- data.frame(elem = cur_sub$ELEMENT_GLOBAL_ID,
+#                        text = cur_txt,
+#                        txt_nchar = txt_nchar,
+#                        stringsAsFactors = FALSE)
+#   txt_df <- filter(txt_df, txt_nchar > 150)
+#   if(dim(txt_df)[1] == 0) next
+#   cur_corp <- tm::VCorpus(tm::VectorSource(txt_df$text))
+#   cur_cln <- USNVC::prep_text(cur_corp)
+#   cur_dtm <- tm::DocumentTermMatrix(cur_cln)
+#   cur_dtm$dimnames$Docs <- as.character(txt_df$elem)
+#   word_freq <- table(cur_dtm$j)
+#   slim <- cur_dtm[, which(word_freq <= 20 & word_freq >= 2)]
+#   slim <- slim[which(rowSums(as.matrix(slim)) > 0), ]
+#   cur_lda <- LDA(x = slim,
+#                  k = cur_k,
+#                  method = "Gibbs",
+#                  control = list(seed = 742,
+#                                 burnin = 1000,
+#                                 thin = 100,
+#                                 iter = 2000))
+#   cur_name <- paste0(cats[i], "_to_", cats[i-1], "_lda_model")
+#   assign(x = cur_name, value = cur_lda)
+# }
+# 
+# lapply(ls(pattern = "_lda_model"), FUN = function(x) {
+#   save(list = x, file = paste0(x, ".rda")) }
+# )
+
+# cur_top <- filter(unit_data, CLASSIFICATION_LEVEL_NAME == "Formation")
+# cur_sub <- filter(unit_data, CLASSIFICATION_LEVEL_NAME == "Division")
+# cur_k <- length(cur_top[[1]])
+# cur_txt <- paste(cur_sub$translatedName,
+#                  cur_sub$typeConcept,
+#                  cur_sub$Physiognomy,
+#                  cur_sub$Environment,
+#                  cur_sub$Dynamics,
+#                  cur_sub$Floristics,
+#                  cur_sub$Range)
+# cur_txt <- conv_txt(cur_txt)
+# txt_nchar <- nchar(cur_txt)
+# txt_df <- data.frame(elem = cur_sub$ELEMENT_GLOBAL_ID,
+#                      text = cur_txt,
+#                      txt_nchar = txt_nchar,
+#                      stringsAsFactors = FALSE)
+# txt_df <- filter(txt_df, txt_nchar > 150)
+# if(dim(txt_df)[1] == 0) stop("Dim1 of txt_df == 0")
+# cur_corp <- tm::VCorpus(tm::VectorSource(txt_df$text))
+# cur_cln <- USNVC::prep_text(cur_corp)
+# cur_dtm <- tm::DocumentTermMatrix(cur_cln)
+# cur_dtm$dimnames$Docs <- as.character(txt_df$elem)
+# word_freq <- table(cur_dtm$j)
+# slim <- cur_dtm[, which(word_freq <= 20 & word_freq >= 2)]
+# slim <- slim[which(rowSums(as.matrix(slim)) > 0), ]
+# Division_to_Formation_lda_model <- LDA(x = slim,
+#                                        k = cur_k,
+#                                        method = "Gibbs",
+#                                        control = list(seed = 742,
+#                                                       burnin = 1000,
+#                                                       thin = 100,
+#                                                       iter = 2000))
+# save(Division_to_Formation_lda_model, file = "Division_to_Formation_lda_model.rda")
+# 
+# 
+# GAP_text <- paste(GAP_df$Class_Name, GAP_df$Description)
+# GAP_corp <- tm::VCorpus(tm::VectorSource(GAP_text))
+# GAP_cln <- USNVC::prep_text(GAP_corp)
+# GAP_dtm <- tm::DocumentTermMatrix(GAP_cln)
+# GAP_dtm$dimnames$Docs <- as.character(GAP_df$Class_Name)
+# GAP_2 <- GAP_dtm[which(rowSums(as.matrix(GAP_dtm)) > 0), ]
+
+# GAP_Class <- posterior(Subclass_to_Class_lda_model, GAP_2)
+# save(GAP_Class, file = "GAP_Class.rda")
+# GAP_Subclass <- posterior(Formation_to_Subclass_lda_model, GAP_2)
+# save(GAP_Subclass, file = "GAP_Subclass.rda")
+# GAP_Formation <- posterior(Division_to_Formation_lda_model, GAP_2)
+# save(GAP_Formation, file = "GAP_Formation.rda")
+# GAP_Division <- posterior(Macrogroup_to_Division_lda_model, GAP_2)
+# save(GAP_Division, file = "GAP_Division.rda")
+# GAP_Macrogroup <- posterior(Group_to_Macrogroup_lda_model, GAP_2)
+# save(GAP_Macrogroup, file = "GAP_Macrogroup.rda")
+# GAP_Group <- posterior(Alliance_to_Group_lda_model, GAP_2)
+# save(GAP_Group, file = "GAP_Group.rda")
+# GAP_Alliance <- posterior(Association_toAlliance_lda_model, GAP_2)
+# save(GAP_Alliance, file = "GAP_Alliance.rda")
+```
+
+Well crud. All of the levels appear to work well except for the `Division`. Upon further inspection, I see that's because the `Division` level has _no_ descriptive text...no _typeConcept_, no _Physiognomy_, nothing beyond a name. This may be a case where the ancestor / children text concatenation is necessary.
 
