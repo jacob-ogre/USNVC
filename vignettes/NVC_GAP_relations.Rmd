@@ -458,22 +458,31 @@ Well crud. All of the levels appear to work well except for the `Division`. Upon
 # NVC correlated topic model
 
 ```{r NVC_CTM}
-cur_sub <- filter(unit_data, CLASSIFICATION_LEVEL_NAME == "Formation")
-# cur_txt <- paste(cur_sub$translatedName,
-#                  cur_sub$typeConcept,
-#                  cur_sub$Physiognomy,
-#                  cur_sub$Environment,
-#                  cur_sub$Dynamics,
-#                  cur_sub$Floristics,
-#                  cur_sub$Range)
-cur_txt <- paste(cur_sub$Physiognomy,
+cur_sub <- filter(unit_data, CLASSIFICATION_LEVEL_NAME == "Alliance")
+cur_txt <- paste(cur_sub$translatedName,
+                 cur_sub$typeConcept,
+                 cur_sub$Physiognomy,
                  cur_sub$Environment,
-                 cur_sub$Dynamics)
+                 cur_sub$Dynamics,
+                 cur_sub$Floristics,
+                 cur_sub$Range)
+# cur_txt <- paste(cur_sub$Physiognomy,
+#                  cur_sub$Environment,
+#                  cur_sub$Dynamics)
+cur_txt <- unlist(lapply(as.character(cur_sub$ELEMENT_GLOBAL_ID),
+                         FUN = USNVC::get_ancestor_typeConcept,
+                         g = NVC_graph))
+# cur_txt <- unlist(lapply(as.character(cur_sub$ELEMENT_GLOBAL_ID),
+#                          FUN = USNVC::get_ancestor_text,
+#                          g = NVC_graph,
+#                          "typeConcept",
+#                          "Physiognomy",
+#                          "Dynamics"))
 cur_txt <- conv_txt(cur_txt)
-out31 <- cur_txt[31]
-cur_txt <- cur_txt[-31]
+# out31 <- cur_txt[31]
+# cur_txt <- cur_txt[-31]
 txt_nchar <- nchar(cur_txt)
-txt_df <- data.frame(elem = cur_sub$ELEMENT_GLOBAL_ID[-31],
+txt_df <- data.frame(elem = cur_sub$ELEMENT_GLOBAL_ID,
                      text = cur_txt,
                      txt_nchar = txt_nchar,
                      stringsAsFactors = FALSE)
@@ -486,10 +495,24 @@ cur_dtm$dimnames$Docs <- as.character(txt_df$elem)
 word_freq <- table(cur_dtm$j)
 slim <- cur_dtm[, which(word_freq <= 10 & word_freq >= 2)]
 slim <- slim[which(rowSums(as.matrix(slim)) > 0), ]
-form_ctm <- CTM(slim, k = 13)
+
+form_ctm <- CTM(cur_dtm, k = 13)
+topics(form_ctm)
+
+form_2_lda <- LDA(cur_dtm, 
+                  k = 74,
+                  method = "gibbs",
+                  control = list(seed = 742,
+                                 burnin = 1000,
+                                 thin = 100,
+                                 iter = 2000))
+topics(form_2_lda)
+table(topics(form_2_lda))
+table(cur_sub$PARENT_ID)
+
 form_lda <- LDA(slim, 
                 k = 13,
-                method = "Gibbs",
+                method = "gibbs",
                 control = list(seed = 742,
                                burnin = 1000,
                                thin = 100,
@@ -501,4 +524,11 @@ out31_dtm <- tm::DocumentTermMatrix(out31_cln)
 pred31 <- posterior(form_ctm, out31_dtm)
 topics(form_ctm)
 cov2cor(form_ctm@Sigma)
+
+par(mfrow = c(6,6), mar = c(1,1,1,1))
+for(i in 1:length(form_ctm@gamma[, 1])) {
+  hist(form_lda@gamma[i, ], xlim = c(0,1), main = form_lda@documents[i])
+}
+
+par(mfrow = c(1,1), mar = c(5,5,4,3))
 ```

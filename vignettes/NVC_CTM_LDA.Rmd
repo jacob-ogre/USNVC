@@ -29,11 +29,10 @@ for(i in 2:length(cats)) {
   cur_top <- filter(unit_data, CLASSIFICATION_LEVEL_NAME == cats[i-1])
   cur_sub <- filter(unit_data, CLASSIFICATION_LEVEL_NAME == cats[i])
   cur_k <- length(cur_top[[1]])
-  # cur_txt <- rep(NA, length(cur_sub[[1]]))
-  # for(i in 1:length())
-  cur_txt <- lapply(cur_sub$ELEMENT_GLOBAL_ID,
-                    FUN = USNVC::get_ancestor_typeConcept,
-                    g = NVC_graph)
+  cur_txt <- unlist(lapply(as.character(cur_sub$ELEMENT_GLOBAL_ID),
+                           FUN = USNVC::get_ancestor_typeConcept,
+                           g = NVC_graph))
+  # print(head(cur_txt))
   cur_txt <- conv_txt(cur_txt)
   txt_nchar <- nchar(cur_txt)
   txt_df <- data.frame(elem = cur_sub$ELEMENT_GLOBAL_ID,

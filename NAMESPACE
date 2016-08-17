@@ -2,6 +2,7 @@
 
 export(ancestors_graph)
 export(children_graph)
+export(get_ancestor_text)
 export(get_ancestor_textDesc)
 export(get_ancestor_typeConcept)
 export(get_ancestors)
