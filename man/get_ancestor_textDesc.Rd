@@ -19,6 +19,6 @@ A string of all relevant descriptive text, concatenated with ' | '
 Return the concatenated text descriptions for ancestors and a vertex
 }
 \examples{
-get_full_textDesc(NVC_graph, "860275")
+get_ancestor_textDesc(NVC_graph, "860275")
 }
 

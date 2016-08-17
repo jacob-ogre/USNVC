@@ -134,7 +134,7 @@ get_full_textDesc <- function(g, v) {
 #' @importFrom igraph V
 #' @export
 #' @examples
-#' get_full_textDesc(NVC_graph, "860275")
+#' get_ancestor_textDesc(NVC_graph, "860275")
 get_ancestor_textDesc <- function(g, v) {
   sub <- ancestors_graph(g, v)
   ances_tD <- paste(paste(igraph::V(sub)$typeConcept,
@@ -145,5 +145,21 @@ get_ancestor_textDesc <- function(g, v) {
                          igraph::V(sub)$Environment,
                          sep = " | "),
                    collapse = " || ")
+  return(ances_tD)
+}
+
+#' Return the concatenated typeDescription for ancestors and a vertex
+#'
+#' @param g The graph to be queried
+#' @param v The NVC category for which the 'ancestors+' description will be
+#'          created
+#' @return A string of all ancestral typeConcepts of v, concatenated with ' | '
+#' @importFrom igraph V
+#' @export
+#' @examples
+#' get_ancestor_typeConcept(NVC_graph, "860275")
+get_ancestor_typeConcept <- function(g, v) {
+  sub <- ancestors_graph(g, v)
+  ances_tD <- paste(igraph::V(sub)$typeConcept, collapse = " | ")
   return(ances_tD)
 }

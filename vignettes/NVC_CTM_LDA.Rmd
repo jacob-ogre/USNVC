@@ -29,13 +29,11 @@ for(i in 2:length(cats)) {
   cur_top <- filter(unit_data, CLASSIFICATION_LEVEL_NAME == cats[i-1])
   cur_sub <- filter(unit_data, CLASSIFICATION_LEVEL_NAME == cats[i])
   cur_k <- length(cur_top[[1]])
-  cur_txt <- paste(cur_sub$translatedName,
-                   cur_sub$typeConcept,
-                   cur_sub$Physiognomy,
-                   cur_sub$Environment,
-                   cur_sub$Dynamics,
-                   cur_sub$Floristics,
-                   cur_sub$Range)
+  # cur_txt <- rep(NA, length(cur_sub[[1]]))
+  # for(i in 1:length())
+  cur_txt <- lapply(cur_sub$ELEMENT_GLOBAL_ID,
+                    FUN = USNVC::get_ancestor_typeConcept,
+                    g = NVC_graph)
   cur_txt <- conv_txt(cur_txt)
   txt_nchar <- nchar(cur_txt)
   txt_df <- data.frame(elem = cur_sub$ELEMENT_GLOBAL_ID,
@@ -57,14 +55,23 @@ for(i in 2:length(cats)) {
                  control = list(seed = 742,
                                 burnin = 1000,
                                 thin = 100,
-                                iter = 2000))
-  cur_name <- paste0(cats[i], "_to_", cats[i-1], "_lda_model")
+                                iter = 4000))
+  cur_ctm <- CTM(x = slim, k = cur_k)
+  cur_name <- paste0(cats[i], "_to_", cats[i-1], "_lda_control")
+  cur_ctm_name <- paste0(cats[i], "_to_", cats[i-1], "_ctm_control")
   assign(x = cur_name, value = cur_lda)
+  assign(x = cur_ctm_name, value = cur_ctm)
+  save(cur_lda, file = paste0(cur_name, ".rda"))
+  save(cur_ctm, file = paste0(cur_ctm_name, ".rda"))
 }
 
-lapply(ls(pattern = "_lda_model"), FUN = function(x) {
-  save(list = x, file = paste0(x, ".rda")) }
-)
+x <- lapply(ls(pattern = "_lda_control"), 
+            FUN = function(x) {
+              save(list = x, file = paste0(x, ".rda")) 
+            } )
 
-
+x <- lapply(ls(pattern = "_ctm_control"), 
+            FUN = function(x) {
+              save(list = x, file = paste0(x, ".rda"))
+            } )
 ```

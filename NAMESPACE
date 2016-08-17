@@ -3,6 +3,7 @@
 export(ancestors_graph)
 export(children_graph)
 export(get_ancestor_textDesc)
+export(get_ancestor_typeConcept)
 export(get_ancestors)
 export(get_children)
 export(get_full_textDesc)
