@@ -1,0 +1,70 @@
+---
+title: "Topic modeling NVC structure"
+author: "Jacob Malcom"
+date: "`r Sys.Date()`"
+output:
+    rmarkdown::html_document:
+        toc: true
+        toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(topicmodels)
+library(USNVC)
+library(tm)
+```
+
+The first step of the analysis is to perform topic modeling on the National Vegetation Classification (NVC) using the inherited text descriptions. In brief, by incorporating the inherited information from higher levels in the hierarchy, I expect to be able to recover the hierarchical structure exactly.
+
+```{r control}
+conv_txt <- function(x) {
+  return(iconv(x = x, from = "iso-8859-1", to = "utf-8"))
+}
+
+cats <- unique(unit_data$CLASSIFICATION_LEVEL_NAME)
+for(i in 2:length(cats)) {
+  print(c(i, cats[i]))
+  cur_top <- filter(unit_data, CLASSIFICATION_LEVEL_NAME == cats[i-1])
+  cur_sub <- filter(unit_data, CLASSIFICATION_LEVEL_NAME == cats[i])
+  cur_k <- length(cur_top[[1]])
+  cur_txt <- paste(cur_sub$translatedName,
+                   cur_sub$typeConcept,
+                   cur_sub$Physiognomy,
+                   cur_sub$Environment,
+                   cur_sub$Dynamics,
+                   cur_sub$Floristics,
+                   cur_sub$Range)
+  cur_txt <- conv_txt(cur_txt)
+  txt_nchar <- nchar(cur_txt)
+  txt_df <- data.frame(elem = cur_sub$ELEMENT_GLOBAL_ID,
+                       text = cur_txt,
+                       txt_nchar = txt_nchar,
+                       stringsAsFactors = FALSE)
+  txt_df <- filter(txt_df, txt_nchar > 150)
+  if(dim(txt_df)[1] == 0) next
+  cur_corp <- tm::VCorpus(tm::VectorSource(txt_df$text))
+  cur_cln <- USNVC::prep_text(cur_corp)
+  cur_dtm <- tm::DocumentTermMatrix(cur_cln)
+  cur_dtm$dimnames$Docs <- as.character(txt_df$elem)
+  word_freq <- table(cur_dtm$j)
+  slim <- cur_dtm[, which(word_freq <= 20 & word_freq >= 2)]
+  slim <- slim[which(rowSums(as.matrix(slim)) > 0), ]
+  cur_lda <- LDA(x = slim,
+                 k = cur_k,
+                 method = "Gibbs",
+                 control = list(seed = 742,
+                                burnin = 1000,
+                                thin = 100,
+                                iter = 2000))
+  cur_name <- paste0(cats[i], "_to_", cats[i-1], "_lda_model")
+  assign(x = cur_name, value = cur_lda)
+}
+
+lapply(ls(pattern = "_lda_model"), FUN = function(x) {
+  save(list = x, file = paste0(x, ".rda")) }
+)
+
+
+```

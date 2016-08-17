@@ -20,3 +20,6 @@ Imports:
     dplyr,
     igraph,
     stringr
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr

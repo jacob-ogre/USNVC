@@ -2,8 +2,10 @@
 
 export(ancestors_graph)
 export(children_graph)
+export(get_ancestor_textDesc)
 export(get_ancestors)
 export(get_children)
+export(get_full_textDesc)
 export(get_full_typeConcept)
 export(get_hier_desc)
 export(get_root_path)

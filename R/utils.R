@@ -99,6 +99,51 @@ prep_for_visNetwork <- function(g) {
 #' get_full_typeConcept(NVC_graph, "860275")
 get_full_typeConcept <- function(g, v) {
   sub <- relatives_graph(g, v)
-  full_tC <- paste(V(sub)$typeConcept, collapse = " | ")
+  full_tC <- paste(igraph::V(sub)$typeConcept, collapse = " | ")
   return(full_tC)
+}
+
+#' Return the concatenated text descriptions for ancestors and children of a vertex
+#'
+#' @param g The graph to be queried
+#' @param v The NVC category for which the 'full' description will be created
+#' @return A string of all relevant descriptive text, concatenated with ' | '
+#' @importFrom igraph V
+#' @export
+#' @examples
+#' get_full_textDesc(NVC_graph, "860275")
+get_full_textDesc <- function(g, v) {
+  sub <- relatives_graph(g, v)
+  full_tD <- paste(paste(igraph::V(sub)$typeConcept,
+                         igraph::V(sub)$diagnosticCharacteristics,
+                         igraph::V(sub)$Physiognomy,
+                         igraph::V(sub)$Floristics,
+                         igraph::V(sub)$Dynamics,
+                         igraph::V(sub)$Environment,
+                         sep = " | "),
+                   collapse = " || ")
+  return(full_tD)
+}
+
+#' Return the concatenated text descriptions for ancestors and a vertex
+#'
+#' @param g The graph to be queried
+#' @param v The NVC category for which the 'ancestors+' description will be
+#'          created
+#' @return A string of all relevant descriptive text, concatenated with ' | '
+#' @importFrom igraph V
+#' @export
+#' @examples
+#' get_full_textDesc(NVC_graph, "860275")
+get_ancestor_textDesc <- function(g, v) {
+  sub <- ancestors_graph(g, v)
+  ances_tD <- paste(paste(igraph::V(sub)$typeConcept,
+                         igraph::V(sub)$diagnosticCharacteristics,
+                         igraph::V(sub)$Physiognomy,
+                         igraph::V(sub)$Floristics,
+                         igraph::V(sub)$Dynamics,
+                         igraph::V(sub)$Environment,
+                         sep = " | "),
+                   collapse = " || ")
+  return(ances_tD)
 }
